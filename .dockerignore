@@ -1,0 +1,13 @@
+# Don't copy in mac fs files
+.DS_Store
+.python-version
+# Don't include any Helm charts
+charts/
+
+# Don't include the config folder, that should be mounted separately during docker run
+config/
+
+# Top-level files that shouldn't be included
+Dockerfile
+README.md
+build-docker.sh
