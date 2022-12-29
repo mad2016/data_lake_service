@@ -11,17 +11,16 @@ config = secrets.read_secrets_from_config()
 
 ACCESS_KEY = config.get("ACCESS_KEY")
 SECRET_KEY = config.get("SECRET_KEY")
-
+HOST = config.get("HOST")
+DATABASE = config.get("DATABASE")
+USER = config.get("USER")
+PASSWORD = config.get("PASSWORD")
 
 s3 = boto3.client(
         's3',
         aws_access_key_id=ACCESS_KEY,
         aws_secret_access_key=SECRET_KEY
     )
-
-s3_client = boto3.client('s3', aws_access_key_id=ACCESS_KEY,
-                         aws_secret_access_key=SECRET_KEY,)
-
 
 def upload_file_to_s3(file_name, bucket, object_name=None):
     
@@ -32,7 +31,7 @@ def upload_file_to_s3(file_name, bucket, object_name=None):
     # Upload the file
 
     try:
-        s3_client.upload_file(file_name, bucket, object_name)
+        s3.upload_file(file_name, bucket, object_name)
     except ClientError as e:
         logging.error(e)
         return False
@@ -52,7 +51,7 @@ def get_file_names(bucket_name):
 
 def read_csv_to_pandas(bucket_name, file_name):
 
-    response = s3_client.get_object(Bucket=bucket_name, Key=file_name)
+    response = s3.get_object(Bucket=bucket_name, Key=file_name)
 
     status = response.get("ResponseMetadata", {}).get("HTTPStatusCode")
 
@@ -66,8 +65,8 @@ def read_csv_to_pandas(bucket_name, file_name):
 
 def sync_s3_to_redshift(bucket_name, file_name):
 
-    conn = redshift_connector.connect(host="test-mad.cbeu9dz56fde.us-east-1.redshift.amazonaws.com", database="dev", user="awsuser",
-                                      password="Password4321")
+    conn = redshift_connector.connect(host=HOST, database=DATABASE, user=USER,
+                                      password=PASSWORD)
 
     copy_cmd_str = "COPY " + file_name + " from s3://" + bucket_name + "/" + file_name
 
