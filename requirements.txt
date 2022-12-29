@@ -1,0 +1,11 @@
+#appmap
+Flask==1.1.4
+gunicorn
+itsdangerous
+markupsafe==2.0.1
+pandas
+Flask-JWT-Extended==4.3.1
+fastavro
+boto3
+redshift_connector
+dynaconf
