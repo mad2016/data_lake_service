@@ -4,7 +4,7 @@ from fastavro import writer, reader, parse_schema
 import numpy as np
 from utils import aws, secrets
 from config import schema
-
+from datetime import datetime
 
 config = secrets.read_secrets_from_config()
 
@@ -38,6 +38,10 @@ def upload_file(df, file_name, verified_records):
         write_temp_file(df, file_name, verified_records)
         aws.upload_file_to_s3(file_name + "_log.csv", log_bucket)
     return None
+
+
+def encode_datetime_as_string(data, schema):
+    return datetime.isoformat(data)
 
 
 def write_temp_file(df, file_name, verified_records):

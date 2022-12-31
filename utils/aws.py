@@ -15,12 +15,14 @@ HOST = config.get("HOST")
 DATABASE = config.get("DATABASE")
 USER = config.get("USER")
 PASSWORD = config.get("PASSWORD")
+SCHEMA_PATH = config.get("SCHEMA_PATH")
 
 s3 = boto3.client(
         's3',
         aws_access_key_id=ACCESS_KEY,
         aws_secret_access_key=SECRET_KEY
     )
+
 
 def upload_file_to_s3(file_name, bucket, object_name=None):
     
@@ -68,7 +70,49 @@ def sync_s3_to_redshift(bucket_name, file_name):
     conn = redshift_connector.connect(host=HOST, database=DATABASE, user=USER,
                                       password=PASSWORD)
 
-    copy_cmd_str = "COPY " + file_name + " from s3://" + bucket_name + "/" + file_name
-
+    copy_cmd_str = "COPY " + file_name + " FROM 's3://" + bucket_name + "/" + file_name + ".avro' " \
+                   + "CREDENTIALS 'aws_access_key_id=" + ACCESS_KEY + \
+                   ";aws_secret_access_key=" + SECRET_KEY + "' FORMAT AS AVRO 's3://" + bucket_name + "/" + SCHEMA_PATH + "/" + file_name + ".json'"
     with conn.cursor() as curs:
         curs.execute(copy_cmd_str)
+
+    copy_cmd_str = "commit;"
+    with conn.cursor() as curs:
+        curs.execute(copy_cmd_str)
+
+
+def reload_table_redshift(bucket_name, file_name):
+    conn = redshift_connector.connect(host=HOST, database=DATABASE, user=USER,
+                                      password=PASSWORD)
+    copy_cmd_str = "TRUNCATE TABLE " + file_name
+    with conn.cursor() as curs:
+        curs.execute(copy_cmd_str)
+    
+    copy_cmd_str = "commit;"
+    with conn.cursor() as curs:
+        curs.execute(copy_cmd_str)
+
+    copy_cmd_str = "COPY " + file_name + " FROM 's3://" + bucket_name + "/" + file_name + ".avro' " \
+                   + "CREDENTIALS 'aws_access_key_id=" + ACCESS_KEY + \
+                   ";aws_secret_access_key=" + SECRET_KEY + "' FORMAT AS AVRO 's3://" + bucket_name + "/" + SCHEMA_PATH + "/" + file_name + ".json'"
+    with conn.cursor() as curs:
+        curs.execute(copy_cmd_str)
+
+    copy_cmd_str = "commit;"
+    with conn.cursor() as curs:
+        curs.execute(copy_cmd_str)
+
+
+def run_query(query_path):
+
+    fd = open(query_path, 'r')
+    query = fd.read()
+    fd.close()
+
+    conn = redshift_connector.connect(host=HOST, database=DATABASE, user=USER,
+                                      password=PASSWORD)
+    with conn.cursor() as curs:
+        curs.execute(query)
+
+    df = curs.fetch_dataframe()
+    return df

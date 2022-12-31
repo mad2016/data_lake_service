@@ -7,7 +7,7 @@
 # 'paths' and 'components' will be populated automatically.
 openapi: 3.0.1
 info:
-  title: Legal Entity Search
+  title: Datalake Service
   version: 1.0.0
 paths:
   /v1/healthz:
@@ -17,60 +17,9 @@ paths:
           content:
             application/json: {}
           description: OK
-  /v1/search:
-    post:
-      summary: Search a company and returns additional data.
-      requestBody:
-        required: True
-        description: The company that we want to search and enrich.
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - entity_key
-                - entity_class
-                - etl_date
-                - api_name
-                - path_top_level
-                - file_name
-                - metadata
-              properties:
-                entity_key:
-                  type: string
-                  description: Optional input if we are doing an internal search. This refers to where the internal entity record is coming from. Omit this field for external searching.
-                entity_class:
-                  type: string
-                  description: Optional input if we are doing an internal search. This is the type of records (what database or entity type?) i.e. SFC, AR, Buyer, Seller. Omit this field for external searching.
-                legal_name:
-                  type: string
-                  description: Name of the company.
-                street_address:
-                  type: string
-                  description: Address of the company.
-                city:
-                  type: string
-                  description: City of the company.
-                state:
-                  type: string
-                  description: State of the company.
-                country:
-                  type: string
-                  description: Country of the company.
-                zip_code:
-                  type: string
-                  description: Zip code of the company address.
-
-
-
-              example: {   "entity_key":"0122233344",
-                "entity_class":"buyer",
-                "legal_name":"Company A",
-                "street_address":"315 E Robinson St 200",
-                "city":"Orlando",
-                "state":"Florida",
-                "country":"United States",
-                "zip_code":"32801"}
+  /v1/load:
+    get:
+      summary: Load the data in the raw layer and send the wrong records to the log bucket then sync the cleaned data to redshift.
       responses:
         200:
           description: Success
@@ -85,255 +34,7 @@ paths:
                   message:
                     type: string
                     description: Success confirmation
-                  data:
-                    type: object
-                    properties:
-                      address_number:
-                        type: string
-                      address_number_ratio_score:
-                        type: integer
-                      city:
-                        type: string
-                      cleaned_entity_name:
-                        type: string
-                      country:
-                        type: string
-                      entity_class:
-                        type: string
-                      entity_id:
-                        type: integer
-                      entity_key:
-                        type: string
-                      entity_name:
-                        type: string
-                      full_address:
-                        type: string
-                      is_exact_address_match:
-                        type: boolean
-                      is_exact_match:
-                        type: boolean
-                      is_exact_name_match:
-                        type: boolean
-                      legal_name:
-                        type: string
-                      matched_address_number:
-                        type: string
-                      matched_city:
-                        type: string
-                      matched_cleaned_entity_name:
-                        type: string
-                      matched_country:
-                        type: string
-                      matched_entity_class:
-                        type: string
-                      matched_entity_id:
-                        type: string
-                      matched_entity_key:
-                        type: string
-                      matched_entity_name:
-                        type: string
-                      matched_full_address:
-                        type: string
-                      matched_legal_name:
-                        type: string
-                      matched_processed_name: 
-                        type: string
-                      matched_state:
-                        type: string
-                      matched_street_address:
-                        type: string
-                      matched_street_address_split:
-                        type: string
-                      matched_street_name:
-                        type: string
-                      matched_tagged_addresses:
-                        type: object
-                        properties:
-                          AddressNumber:
-                            type: string
-                          CountryName:
-                            type: string
-                          PlaceName:
-                            type: string
-                          StateName:
-                            type: string
-                          StreetNamePostType:
-                            type: string
-                          ZipCode:
-                            type: string
-                      matched_zip_code:
-                        type: string
-                      matched_zip_code_abv:
-                        type: string
-                      name_partial_ratio_score:
-                        type: integer
-                      name_ratio_score:
-                        type: integer
-                      name_token_set_ratio_score:
-                        type: integer
-                      name_token_sort_ratio_score:
-                        type: integer
-                      processed_name:
-                        type: string
-                      state:
-                        type: string
-                      street_address:
-                        type: string
-                      street_address_split:
-                        type: string
-                      street_name:
-                        type: string
-                      street_name_ratio_score:
-                        type: integer
-                      tagged_addresses:
-                        type: object
-                        properties:
-                          AddressNumber:
-                            type: string
-                          CountryName:
-                            type: string
-                          PlaceName:
-                            type: string
-                          StateName:
-                            type: string
-                          StreetNamePostType:
-                            type: string
-                          ZipCode:
-                            type: string
-                      zip_code:
-                        type: string
-                      zip_code_abv:
-                        type: string
-                      zip_code_ratio_score:
-                        type: integer
-                    example:
-                        [
-                        {
-                            "address_number": "1360",
-                            "address_number_ratio_score": 100,
-                            "city": "cambridge",
-                            "cleaned_entity_name": "stellabella toys",
-                            "country": "us",
-                            "entity_class": "",
-                            "entity_id": 0,
-                            "entity_key": "",
-                            "entity_name": "Stellabella Toys*",
-                            "full_address": "1360 cambridge st cambridge ma 02139 us",
-                            "is_exact_address_match": true,
-                            "is_exact_match": true,
-                            "is_exact_name_match": true,
-                            "legal_name": "Stellabella Toys*",
-                            "matched_address_number": "1360",
-                            "matched_city": "cambridge",
-                            "matched_cleaned_entity_name": "stellabella toys",
-                            "matched_country": "united states",
-                            "matched_entity_class": "ar_buyer",
-                            "matched_entity_id": 22204,
-                            "matched_entity_key": "99984",
-                            "matched_entity_name": "Stellabella Toys*",
-                            "matched_full_address": "1360 cambridge st cambridge ma 02139 united states",
-                            "matched_legal_name": "Stellabella Toys*",
-                            "matched_processed_name": "stellabella toys",
-                            "matched_state": "ma",
-                            "matched_street_address": "1360 cambridge st",
-                            "matched_street_address_split": "1360 cambridge st",
-                            "matched_street_name": "None",
-                            "matched_tagged_addresses": {
-                                "AddressNumber": "1360",
-                                "CountryName": "states",
-                                "PlaceName": "cambridge",
-                                "StateName": "ma",
-                                "StreetNamePostType": "st",
-                                "ZipCode": "02139"
-                            },
-                            "matched_zip_code": "02139",
-                            "matched_zip_code_abv": "02139",
-                            "name_partial_ratio_score": 100,
-                            "name_ratio_score": 100,
-                            "name_token_set_ratio_score": 100,
-                            "name_token_sort_ratio_score": 100,
-                            "processed_name": "stellabella toys",
-                            "state": "ma",
-                            "street_address": "1360 cambridge st",
-                            "street_address_split": "1360 cambridge st",
-                            "street_name": "None",
-                            "street_name_ratio_score": 100,
-                            "tagged_addresses": {
-                                "AddressNumber": "1360",
-                                "CountryName": "us",
-                                "PlaceName": "cambridge",
-                                "StateName": "ma",
-                                "StreetNamePostType": "st",
-                                "ZipCode": "02139"
-                            },
-                            "zip_code": "02139",
-                            "zip_code_abv": "02139",
-                            "zip_code_ratio_score": 100
-                        },
-                        {
-                            "address_number": "1360",
-                            "address_number_ratio_score": 100,
-                            "city": "cambridge",
-                            "cleaned_entity_name": "stellabella toys",
-                            "country": "us",
-                            "entity_class": "",
-                            "entity_id": 0,
-                            "entity_key": "",
-                            "entity_name": "Stellabella Toys*",
-                            "full_address": "1360 cambridge st cambridge ma 02139 us",
-                            "is_exact_address_match": true,
-                            "is_exact_match": true,
-                            "is_exact_name_match": true,
-                            "legal_name": "Stellabella Toys*",
-                            "matched_address_number": "1360",
-                            "matched_city": "cambridge",
-                            "matched_cleaned_entity_name": "stellabella toys",
-                            "matched_country": "united states",
-                            "matched_entity_class": "ar_buyer",
-                            "matched_entity_id": 22205,
-                            "matched_entity_key": "131228",
-                            "matched_entity_name": "Stellabella Toys",
-                            "matched_full_address": "1360 cambridge street cambridge ma 02139 united states",
-                            "matched_legal_name": "Stellabella Toys",
-                            "matched_processed_name": "stellabella toys",
-                            "matched_state": "ma",
-                            "matched_street_address": "1360 cambridge street",
-                            "matched_street_address_split": "1360 cambridge street",
-                            "matched_street_name": "None",
-                            "matched_tagged_addresses": {
-                                "AddressNumber": "1360",
-                                "CountryName": "states",
-                                "PlaceName": "cambridge",
-                                "StateName": "ma",
-                                "StreetNamePostType": "street",
-                                "ZipCode": "02139"
-                            },
-                            "matched_zip_code": "02139",
-                            "matched_zip_code_abv": "02139",
-                            "name_partial_ratio_score": 100,
-                            "name_ratio_score": 100,
-                            "name_token_set_ratio_score": 100,
-                            "name_token_sort_ratio_score": 100,
-                            "processed_name": "stellabella toys",
-                            "state": "ma",
-                            "street_address": "1360 cambridge st",
-                            "street_address_split": "1360 cambridge st",
-                            "street_name": "None",
-                            "street_name_ratio_score": 100,
-                            "tagged_addresses": {
-                                "AddressNumber": "1360",
-                                "CountryName": "us",
-                                "PlaceName": "cambridge",
-                                "StateName": "ma",
-                                "StreetNamePostType": "st",
-                                "ZipCode": "02139"
-                            },
-                            "zip_code": "02139",
-                            "zip_code_abv": "02139",
-                            "zip_code_ratio_score": 100
-                        }
-                    ]
-                    description: Company data
+            
         400:
           description: Error
           content:
@@ -345,3 +46,66 @@ paths:
                     type: string
                     description: error message
 
+  /v1/reload:
+    post:
+      summary: Restore certain table from raw_layer
+      requestBody:
+        required: True
+        description: The table we want to restore.
+        content:
+          application/json:
+              schema:
+                type: object
+                required:
+                  - table_name
+              example: {"table_name": "jobs"}
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    description: Success confirmation
+                  message:
+                    type: string
+                    description: Success confirmation
+
+  /v1/get-employees-by-quarter:
+      get:
+        summary: "Number of employees hired for each job and department in 2021 divided by quarter, ordered alphabetically by department and job."
+        responses:
+          200:
+            description: Success
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    ok:
+                      type: boolean
+                      description: Success confirmation
+                    data:
+                      type: object
+                      description: data result
+
+  /v1/get-employees-more-than-media:
+      get:
+        summary: "List of ids, name and number of employees hired of each department that hired more employees than the mean of employees hired in 2021 for all the departments, ordered by the number of employees hired (descending)"
+        responses:
+          200:
+            description: Success
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    ok:
+                      type: boolean
+                      description: Success confirmation
+                    data:
+                      type: object
+                      description: data result
