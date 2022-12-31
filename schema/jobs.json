@@ -1,0 +1,10 @@
+{
+    "doc": "jobs",
+    "name": "jobs",
+    "namespace": "jobs",
+    "type": "record",
+    "fields": [
+        {"name": "id", "type": "int"},
+        {"name": "job", "type": "string"}
+    ]
+}

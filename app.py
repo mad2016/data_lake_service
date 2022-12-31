@@ -53,6 +53,7 @@ def load_data():
         df = aws.read_csv_to_pandas(source_bucket, os.path.basename(key))
         df = df.convert_dtypes()
         null_rows_df, not_null_rows_df = rules.split_nulls(df)
+        print(not_null_rows_df)
         # send file to raw bucket
         err = avro.upload_file(null_rows_df, filename, False)
         if err is not None:
@@ -68,6 +69,32 @@ def load_data():
     return make_response({"OK": True, "msg": "Process Finished!"}, 200)
 
 
+@app.route("/v1/reload", methods=["POST"])
+def reload_data():
+    r = request.json
+    print(r["table_name"])
+    aws.reload_table_redshift(raw_bucket, r["table_name"])
+    return make_response({"OK": True, "msg": "Process Finished!"}, 200)
+
+
+@app.route("/v1/get-employees-by-quarter", methods=["GET"])
+def get_employess_by_quarter():
+    df = aws.run_query("sql/employees_by_q.sql")
+    result = df.to_json(orient="records")
+    parsed = json.loads(result)
+    return make_response({"OK": True, "data": parsed}, 200)
+
+
+@app.route("/v1/get-employees-more-than-media", methods=["GET"])
+def get_employess_more_than_media():
+    df = aws.run_query("sql/employees_more_than_media.sql")
+    result = df.to_json(orient="records")
+    parsed = json.loads(result)
+    return make_response({"OK": True, "data": parsed}, 200)
+
+
+
+
 @app.route("/v1/admin", methods=["GET"])
 @jwt_required()
 def admin():
@@ -76,3 +103,5 @@ def admin():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=8080, threaded=True)
+
+

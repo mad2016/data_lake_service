@@ -1,20 +1,16 @@
 hired_employees_schema = {
-    "doc": "Hired Employees",
-    "name": "Hired Employees",
-    "namespace": "Employees",
+    "doc": "hired_employees",
+    "name": "hired_employees",
+    "namespace": "hired_employees",
     "type": "record",
     "fields": [
         {"name": "id", "type": "int"},
         {"name": "name", "type": "string"},
-        {
-            "name": "datetime",
-            "type": {"type": "string", "logicalType": "timestamp-micros"},
-        },
+        {"name": "datetime", "type": "string"},
         {"name": "department_id", "type": "int"},
-        {"name": "job_id", "type": "long"},
-    ],
+        {"name": "job_id", "type": "int"}
+    ]
 }
-
 
 hired_employees_columns = ["id", "name", "datetime", "department_id", "job_id"]
 

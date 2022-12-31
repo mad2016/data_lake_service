@@ -1,0 +1,10 @@
+{
+    "doc": "department",
+    "name": "department",
+    "namespace": "department",
+    "type": "record",
+    "fields": [
+        {"name": "id", "type": "int"},
+        {"name": "department", "type": "string"}
+    ]
+}
